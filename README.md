@@ -1,14 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Deploy Next JS web app using App Engine
 
-## Getting Started
+1. Clone repository
 
-First, run the development server:
-
-```bash
-npm run dev
-```
-
-Gcloud setup
+2. gcloud setup
 
 ```
 gcloud init
@@ -25,3 +19,17 @@ gcloud config set project drawingfire-b72a8 # replace with your gcp project id
 > Note
 Reload your window using ctrl + shift + p and selecting reload window for the default project setting to take
 affect
+
+3. Install dependencies 
+```bash
+npm install
+```
+
+3. Deploy on app engine (assumes you have enabled app engine & have the neccessary permissios)
+
+```
+gcloud app deploy --bucket=gs://my-next-app
+```
+
+> Note
+For the first application on App Engine the `service` variable must be `default` following application can have the names you like
