@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
 
         const [job] = await bigquery.createQueryJob({ query });
         const [rows] = await job.getQueryResults();
-        console.log(rows);
         
         return NextResponse.json(rows, {
             headers: {
