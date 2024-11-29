@@ -25,7 +25,6 @@ export default function Home() {
         description: "BigQuery data has been retrieved.",
       })
     } catch (error) {
-      console.error('Error fetching data:', error);
       toast({
         title: "Error",
         description: "Failed to fetch data from BigQuery.",
@@ -49,7 +48,6 @@ export default function Home() {
         description: `Set quantity to ${qty}`,
       })
     } catch (error) {
-      console.error(`Error updating data`, error)
       toast({
         title: "Error",
         description: "Failed to update data in BigQuery.",
