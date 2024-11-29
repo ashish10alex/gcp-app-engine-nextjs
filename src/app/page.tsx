@@ -4,8 +4,9 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {ToogleTheme} from './toogleTheme'
+import { ToogleTheme } from './toogleTheme'
 import { useToast } from "@/hooks/use-toast"
+import { Loader2 } from "lucide-react"
 
 export default function Home() {
   const [data, setData] = useState(null);
@@ -15,63 +16,107 @@ export default function Home() {
   const { toast } = useToast()
 
   const getDataFromBigquery = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('/api/get_data_from_bigquery');
-        setData(response.data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/get_data_from_bigquery');
+      setData(response.data);
+      toast({
+        title: "Data fetched successfully",
+        description: "BigQuery data has been retrieved.",
+      })
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch data from BigQuery.",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false);
+    }
   }
 
   const updateDataInBigQuery = async() => {
-    try{
-      const update = {
-        new: qty
-      }
+    try {
+      const update = { new: qty }
       toast({
         title: "Updating data in BigQuery",
         description: `Setting quantity to ${qty}`,
       })
-      const response = await axios.post('/api/update_data_in_bigquery', update);
+      await axios.post('/api/update_data_in_bigquery', update);
       toast({
         title: "Updated data in BigQuery",
         description: `Set quantity to ${qty}`,
       })
-    } catch (error){
-        console.error(`Error updating data`, error)
+    } catch (error) {
+      console.error(`Error updating data`, error)
+      toast({
+        title: "Error",
+        description: "Failed to update data in BigQuery.",
+        variant: "destructive",
+      })
     }
   }
 
-  const updateQty = async (quantity:string) => {
+  const updateQty = (quantity: string) => {
     setQty(Number(quantity))
   }
 
   return (
-    <>
-    <div className="flex justify-end mt-4 p-4">
-      <ToogleTheme/>
-    </div>
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-end mb-8">
+          <ToogleTheme />
+        </div>
+        
+        <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">BigQuery Test</h1>
+          
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Quantity</label>
+              <Input 
+                id="quantity"
+                placeholder="Enter new quantity" 
+                onChange={(e) => updateQty(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            
+            <div className="flex space-x-4">
+              <Button 
+                onClick={getDataFromBigquery}
+                className="w-1/2"
+                disabled={loading}
+              >
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                Get Data
+              </Button>
+              <Button 
+                onClick={updateDataInBigQuery}
+                className="w-1/2"
+                disabled={loading}
+              >
+                Update Data
+              </Button>
+            </div>
+          </div>
 
-    <div className='flex flex-col space-y-4'>
-      <Input placeholder='New quantity' onChange={(e) => {updateQty(e.target.value)}} />
-      <div className='flex space-x-4'>
-        <Button onClick={getDataFromBigquery}>Get Data from BigQuery</Button>
-        <Button onClick={updateDataInBigQuery}>Update Data in BigQuery</Button>
+          <div className="mt-8">
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              </div>
+            ) : data ? (
+              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded-md overflow-x-auto text-sm">
+                {JSON.stringify(data, null, 2)}
+              </pre>
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400 text-center">No data loaded yet. Click "Get Data" to fetch from BigQuery.</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : data ? (
-        <pre>Data from API: {JSON.stringify(data, null, 2)}</pre>
-      ) : (
-        <p>No data loaded yet.</p>
-      )}
-    </div>
-    </>
   );
 }
