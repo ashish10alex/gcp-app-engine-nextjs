@@ -8,7 +8,12 @@ export const revalidate = 0;
 export async function GET(request: NextRequest) {
     try {
         const bigquery = new BigQuery({});
-        const query = `SELECT *, current_timestamp FROM drawingfire-b72a8.electrics_cars.custom LIMIT 1000`;
+        const query = `
+        SELECT 
+            *,
+            current_timestamp as current_timestamp
+        FROM drawingfire-b72a8.electrics_cars.custom LIMIT 1000
+        `;
 
         const [job] = await bigquery.createQueryJob({ query });
         const [rows] = await job.getQueryResults();
